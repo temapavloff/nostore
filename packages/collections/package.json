@@ -1,0 +1,26 @@
+{
+  "name": "@nostore/collections",
+  "version": "0.0.1",
+  "description": "",
+  "type": "module",
+  "main": "./dist/index.js",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "peerDependencies": {
+    "@nostore/core": "workspace:*"
+  },
+  "files": [
+    "./dist/**/*"
+  ],
+  "scripts": {
+    "test": "node --loader=tsm --loader=../../lib/node/resolver.mjs --test ./tests/*.test.ts",
+    "build": "tsc"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT"
+}
