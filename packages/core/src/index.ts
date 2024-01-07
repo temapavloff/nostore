@@ -9,3 +9,4 @@ export { toReadonly } from './readonly';
 export { type Store, type ReadonlyStore } from './store';
 export { type RecordStore, type ReadonlyRecord } from './record_store'
 export { type ArrayStore, type ReadonlyArray } from './array_store';
+export { type MinimalStore } from './types'

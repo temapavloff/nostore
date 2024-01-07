@@ -29,6 +29,12 @@ importers:
 
   packages/core: {}
 
+  packages/remote:
+    dependencies:
+      '@nostore/core':
+        specifier: workspace:*
+        version: link:../core
+
 packages:
 
   /@esbuild/android-arm@0.15.18:

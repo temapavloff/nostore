@@ -32,3 +32,14 @@ test('should create a new store', () => {
     { ...TODOS[0], completed: true }, TODOS[1], TODOS[3],
   ]);
 });
+
+test('should be able to use regular values as compose arguments', () => {
+  const userId = createStore(1);
+  const postId = createStore(1);
+
+  const pathStore = compose(['/users/', userId, '/posts/', postId], (...args) => {
+    return args.join('');
+  });
+
+  assert.equal(pathStore.get(), '/users/1/posts/1');
+});
