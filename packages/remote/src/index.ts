@@ -1,4 +1,4 @@
-import { MinimalStore, compose, createRecord, toReadonlyRecord, transact } from '@nostore/core';
+import { MinimalStore, compose, createRecord, toReadonlyRecord } from '@nostore/core';
 
 export type CacheEngine<T> = {
   setKey(key: string, value: T): void,
@@ -52,7 +52,8 @@ const createRemote = <T>(
     updaing: boolean,
     error: Error | null,
     data: T | null,
-  }>({ loading: false, updaing: false, error: null, data: initialValue });
+    lastValidData: T | null,
+  }>({ loading: false, updaing: false, error: null, data: initialValue, lastValidData: null });
 
   if (initialValue) {
     cache.setKey(serializeKey(keyStore.get()), initialValue);
@@ -61,16 +62,15 @@ const createRemote = <T>(
   const runSync = async (key: PrimitiveKeyPart[]) => {
     const keyString = serializeKey(key);
     try {
-      transact(() => {
-        const oldValue = cache.getKey(keyString);
-        if (oldValue) {
-          stateStore.setKey('data', oldValue);
-          stateStore.setKey('updaing', true);
-        } else {
-          stateStore.setKey('data', null);
-          stateStore.setKey('loading', true);
-        }
-      });
+      const oldValue = cache.getKey(keyString);
+      if (oldValue) {
+        stateStore.setKey('data', oldValue);
+        stateStore.setKey('updaing', true);
+      } else {
+        stateStore.setKey('lastValidData', stateStore.get().data);
+        stateStore.setKey('data', null);
+        stateStore.setKey('loading', true);
+      }
 
       let maybeResult = sync(...key);
       let result: T | null = null;
@@ -78,19 +78,16 @@ const createRemote = <T>(
         result = await maybeResult;
       }
 
+      stateStore.setKey('lastValidData', null);
       stateStore.setKey('data', result);
-      transact(() => {
-        stateStore.setKey('data', result);
-        stateStore.setKey('error', null);
-      });
+      stateStore.setKey('error', null);
 
     } catch (e) {
+      stateStore.setKey('data', null);
       stateStore.setKey('error', e instanceof Error ? e : new Error(String(e)));
     } finally {
-      transact(() => {
-        stateStore.setKey('loading', false);
-        stateStore.setKey('updaing', false);
-      });
+      stateStore.setKey('loading', false);
+      stateStore.setKey('updaing', false);
     }
   };
 

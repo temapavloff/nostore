@@ -1,7 +1,7 @@
 import { createEmitter } from './emitter';
 import { toReadonly } from './readonly';
+import { createScheduler } from './scheduler';
 import { Store, createStore, toReadonlyStore } from './store';
-import { isLocked, onUnlock, transact } from './transactions';
 
 type Entries<T, K extends keyof T> = {
   [P in K]: [P, T[P]];
@@ -33,40 +33,39 @@ const createRecord = <T extends object, K extends keyof T = keyof T>(initialStat
     [k]: v?.get(),
   }), {} as T);
 
+  const changedKeys: Set<K> = new Set();
+  const emit = createScheduler(() => {
+    if (changedKeys.size) {
+      emitter.emit(getCurrentState(), Array.from(changedKeys));
+      changedKeys.clear();
+    }
+  });
+
   return {
     get() {
       return getCurrentState();
     },
 
     set(nextState: T) {
-      const changedKeys: K[] = [];
-      transact(() => {
-        (Object.entries(nextState) as Entries<T, K>).forEach(([k, v]) => {
-          const store = getOrCreateStore(k);
-          if (store.set(v)) {
-            changedKeys.push(k);
-          }
-        });
+      const currentChanges: K[] = [];
+      (Object.entries(nextState) as Entries<T, K>).forEach(([k, v]) => {
+        const store = getOrCreateStore(k);
+        if (store.set(v)) {
+          currentChanges.push(k);
+          changedKeys.add(k);
+        }
       });
 
-      if (changedKeys.length > 0) {
-        if (isLocked()) {
-          onUnlock(emitter, () => {
-            const currentState = getCurrentState();
-            emitter.emit(currentState, Object.keys(currentState) as K[]);
-          });
-        } else {
-          emitter.emit(getCurrentState(), changedKeys);
-        }
-      }
+      emit();
 
-      return changedKeys;
+      return currentChanges;
     },
 
     setKey<P extends K>(key: P, value: T[P]) {
       const store = getOrCreateStore(key);
       if (store.set(value)) {
-        emitter.emit(getCurrentState(), [key]);
+        changedKeys.add(key);
+        emit();
         return true;
       }
 

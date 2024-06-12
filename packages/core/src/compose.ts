@@ -9,17 +9,17 @@ const getValue = (storeOrValue: any | MinimalStore<any>): StoreValue<typeof stor
 type StoreValue<S> = S extends MinimalStore<infer T> ? T : S;
 
 const compose = <R, S extends Array<any | MinimalStore<any>>>(
-  stores: [...S],
+  dependencies: [...S],
   composer: (...args: { [Index in keyof S]: StoreValue<S[Index]> }) => R,
 ): ReadonlyStore<R> => {
-  const initialValue = composer(...stores.map(s => getValue(s)) as { [Index in keyof S]: StoreValue<S[Index]> });
+  const initialValue = composer(...dependencies.map(s => getValue(s)) as { [Index in keyof S]: StoreValue<S[Index]> });
   const store = createStore(initialValue);
 
   const listener = () => {
-    store.set(composer(...stores.map(s => getValue(s)) as { [Index in keyof S]: StoreValue<S[Index]> }));
+    store.set(composer(...dependencies.map(s => getValue(s)) as { [Index in keyof S]: StoreValue<S[Index]> }));
   };
 
-  stores.forEach(s => {
+  dependencies.forEach(s => {
     if (isStore(s)) {
       s.subscribe(listener);
     }

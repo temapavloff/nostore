@@ -1,10 +1,12 @@
 import { createEmitter } from './emitter';
 import { toReadonly } from './readonly';
-import { onUnlock } from './transactions';
+import { createScheduler } from './scheduler';
 
 const createStore = <T>(initialState: T) => {
   let currentState = initialState;
   const emitter = createEmitter<[T]>();
+
+  const emit = createScheduler(() => emitter.emit(currentState));
 
   return {
     get() {
@@ -14,7 +16,7 @@ const createStore = <T>(initialState: T) => {
     set(nextState: T) {
       if (currentState !== nextState) {
         currentState = nextState;
-        onUnlock(emitter, () => emitter.emit(currentState));
+        emit();
         return true;
       }
 
