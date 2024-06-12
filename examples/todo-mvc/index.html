@@ -1,13 +1,38 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite + TS</title>
-  </head>
-  <body>
-    <div id="app"></div>
-    <script type="module" src="/src/main.ts"></script>
-  </body>
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vite + TS</title>
+</head>
+
+<body>
+  <div id="app">
+    <section class="todoapp">
+      <header class="header" id="editor">
+
+      </header>
+      <!-- This section should be hidden by default and shown when there are todos -->
+      <section class="main" id="todos">
+
+      </section>
+      <!-- This footer should be hidden by default and shown when there are todos -->
+      <footer class="footer" id="filters">
+
+      </footer>
+    </section>
+    <footer class="info">
+      <p>Double-click to edit a todo</p>
+      <!-- Remove the below line ↓ -->
+      <p>Template by <a href="http://sindresorhus.com">Sindre Sorhus</a></p>
+      <!-- Change this out with your name and url ↓ -->
+      <p>Created by <a href="http://todomvc.com">you</a></p>
+      <p>Part of <a href="http://todomvc.com">TodoMVC</a></p>
+    </footer>
+  </div>
+  <script type="module" src="/src/main.ts"></script>
+</body>
+
 </html>

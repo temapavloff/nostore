@@ -11,5 +11,10 @@
   "devDependencies": {
     "typescript": "^5.2.2",
     "vite": "^5.2.0"
+  },
+  "dependencies": {
+    "todomvc-app-css": "2.4.3",
+    "todomvc-common": "1.0.5",
+    "@nostore/core": "workspace:*"
   }
 }
