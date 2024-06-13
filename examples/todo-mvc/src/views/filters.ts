@@ -1,13 +1,6 @@
-import { compose } from '@nostore/core';
-import { filters, updateFilters } from '../stores/filters'
-import { clearCompleted, todos } from '../stores/todos';
-
-const filtersView = compose([todos, filters], (todos, filters) => {
-  return {
-    left: todos.filter(f => !f.completed).length,
-    filter: filters.completion,
-  }
-});
+import { updateFilters } from '../stores/filters'
+import { filtersView } from '../stores/filtersView';
+import { clearCompleted } from '../stores/todos';
 
 const hanldeFilter = (e: HTMLElement) => {
   if (e.tagName === 'A') {
