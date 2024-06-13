@@ -5,8 +5,11 @@ const queue: Task[] = [];
 const enqueue = (task: Task) => {
   if (queue.length === 0) {
     queueMicrotask(() => {
-      queue.forEach(task => task());
-      queue.length = 0;
+      let task = queue.shift();
+      while (task) {
+        task();
+        task = queue.shift();
+      }
     });
   }
   queue.push(task);

@@ -47,3 +47,21 @@ test('should be able to use regular values as compose arguments', () => {
 
   assert.equal(pathStore.get(), '/users/1/posts/1');
 });
+
+test('should call listeners once during one event loop circle', async (t) => {
+  const a = createStore(1);
+  const b = createStore(1);
+
+  const mult = compose([a, b], (a, b) => ({ a, b }));
+  const l = t.mock.fn();
+  mult.subscribe(l);
+
+  assert.deepEqual(mult.get(), { a: 1, b: 1 });
+
+  a.set(2);
+  b.set(2);
+
+  await nextTick();
+  assert.deepEqual(mult.get(), { a: 2, b: 2 });
+  assert.equal(l.mock.callCount(), 1);
+});
